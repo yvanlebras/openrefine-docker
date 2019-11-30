@@ -30,8 +30,6 @@ done
 cd /refine-python
 python openrefine_create_project_API.py "/import/$DATASET_NAME" &
 
-# Launch traffic monitor which will automatically kill the container if traffic
-# stops
-exec /monitor_traffic.sh &
+
 #And nginx in foreground mode.
 nginx -g 'daemon off;'

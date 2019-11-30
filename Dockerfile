@@ -75,7 +75,7 @@ ADD ./get_notebook.py /get_notebook.py
 # Our very important scripts. Make sure you've run `chmod +x startup.sh
 # monitor_traffic.sh` outside of the container!
 ADD ./startup.sh /startup.sh
-ADD ./monitor_traffic.sh /monitor_traffic.sh
+
 # Create and export project
 ADD ./openrefine_create_project_API.py /refine-python/openrefine_create_project_API.py
 ADD ./openrefine_export_project.py /refine-python/openrefine_export_project.py
