@@ -21,7 +21,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 RUN apt-get update  && \
     apt-get install --no-install-recommends -y \
     wget python python-pip \
-    openjdk-8-jdk vim unzip curl
+    openjdk-8-jdk vim unzip curl net-tools
 
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 ENV PATH="/usr/lib/jvm/java-8-openjdk-amd64/bin:${PATH}"
