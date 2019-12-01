@@ -35,7 +35,7 @@ else:
 			localefile.write(score_recupere.export_rows())
 			#Don't forget to close the flux, else the command put will not work
 			localefile.close()	
-			put('%s_refine' % name_file, file_type='tsv')
+			put('%s_refine' % name_file, file_type='tabular')
 
 
 sys.exit(0)
