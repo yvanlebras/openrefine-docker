@@ -11,7 +11,7 @@ r = refine.Refine()
 
 
 if os.path.isfile("fichier_donnee.txt"):
-	print "sortie erreur"
+	print("sortie erreur")
 	os.remove("fichier_donnee.txt")
 	sys.exit(1)
 
