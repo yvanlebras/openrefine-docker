@@ -20,32 +20,28 @@ ENV DEBIAN_FRONTEND=noninteractive \
 #Vim to modify ass porky
 RUN apt-get update  && \
     apt-get install --no-install-recommends -y \
-    wget python python-pip \
-    openjdk-8-jdk vim unzip curl net-tools
+    wget python3 maven jq \
+    openjdk-11-jdk vim unzip curl npm
 
-ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
-ENV PATH="/usr/lib/jvm/java-8-openjdk-amd64/bin:${PATH}"
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
+ENV PATH="/usr/lib/jvm/java-11-openjdk-amd64/bin:${PATH}"
 
-RUN pip install setuptools && \
-    pip install bioblend galaxy-ie-helpers && \
-    pip install https://github.com/ValentinChCloud/urllib2_file/archive/master.tar.gz
+#RUN pip install setuptools && \
+#    pip install bioblend galaxy-ie-helpers && \
+#    pip install https://github.com/ValentinChCloud/urllib2_file/archive/master.tar.gz
 
 # Download and "mount" OpenRefine
-RUN wget -q -O - --no-check-certificate https://github.com/ValentinChCloud/OpenRefine/archive/master.tar.gz |tar -xz && \
-    mv OpenRefine-master OpenRefine
+RUN wget -q -O - --no-check-certificate https://github.com/OpenRefine/OpenRefine/archive/refs/tags/3.8.2.tar.gz |tar -xz && \
+    mv OpenRefine-3.8.2 OpenRefine
 
 # make some changes to Openrefine to export data to galaxy history
-ADD ./ExportRowsCommand.java OpenRefine/main/src/com/google/refine/commands/project/ExportRowsCommand.java
-ADD ./exporters.js OpenRefine/main/webapp/modules/core/scripts/project/exporters.js
-ADD ./langs/translation-default.json OpenRefine/main/webapp/modules/core/langs/translation-default.json
-ADD ./langs/translation-fr.json OpenRefine/main/webapp/modules/core/langs/translation-fr.json
-ADD ./langs/translation-fr.json OpenRefine/main/webapp/modules/core/langs/translation-en.json
+#ADD ./ExportRowsCommand.java OpenRefine/main/src/com/google/refine/commands/project/ExportRowsCommand.java
+#ADD ./exporters.js OpenRefine/main/webapp/modules/core/scripts/project/exporters.js
+
 
 RUN /OpenRefine/refine build
 
-#Get python api openrefine
-RUN wget -q -O - --no-check-certificate https://github.com/maxogden/refine-python/archive/master.tar.gz | tar -xz && \
-    mv refine-python-master refine-python
+RUN cd /usr/bin/ && wget https://github.com/opencultureconsulting/orcli/raw/main/orcli && chmod +x orcli
 
 #Import data
 ADD ./get_notebook.py /get_notebook.py
