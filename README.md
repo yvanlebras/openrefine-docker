@@ -6,6 +6,7 @@ OpenRefine (formerly Google Refine) is a powerful tool for working with messy da
 transforming it from one format into another; and extending it with web services and external data.
 
 Original 2019 work by: Yvan Le Bras https://github.com/yvanlebras
+
 Fork 2024 by: Giuseppe Profiti for BioDec S.r.l. https://github.com/profgiuseppe
 
 Thanks to:
@@ -15,6 +16,7 @@ Thanks to:
 
 # Content of the repo
 
+```
 ├── bash-refine
 │   ├── bash-refine.sh : helper function to interact with OpenRefine
 │   └── myworkflow.sh : script that imports galaxy dataset to OpenRefine 
@@ -25,6 +27,7 @@ Thanks to:
 │   └── upload-file.py : helper script that uploads the OpenRefine output to Galaxy
 ├── LICENSE.txt : code license
 └── README.md : this file
+```
 
 # How to use
 
