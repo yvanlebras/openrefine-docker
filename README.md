@@ -23,7 +23,7 @@ Thanks to:
 ├── Dockerfile : Docker image building instructions
 ├── extension : source code for the OpenRefine extension that exports to Galaxy
 ├── galaxy
-│   ├── interactivetool\_openrefine.xml : Galaxy tool XML for running the OpenRefine interactive tool
+│   ├── interactivetool_openrefine.xml : Galaxy tool XML for running the OpenRefine interactive tool
 │   └── upload-file.py : helper script that uploads the OpenRefine output to Galaxy
 ├── LICENSE.txt : code license
 └── README.md : this file
