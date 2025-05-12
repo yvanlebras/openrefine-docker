@@ -1,68 +1,41 @@
-FROM ubuntu:latest
-
-MAINTAINER Yvan Le Bras "yvan.le-bras@mnhn.fr"
-
-# From previous work from Valentin Chambon
-# These environment variables are passed from Galaxy to the container
-# and help you enable connectivity to Galaxy from within the container.
-# This means your user can import/export data from/to Galaxy.
+FROM debian:bookworm
 
 USER root
-ENV DEBIAN_FRONTEND=noninteractive \
-    API_KEY=none \
-    DEBUG=false \
-    PROXY_PREFIX=none \
-    GALAXY_URL=none \
-    GALAXY_WEB_PORT=10000 \
-    HISTORY_ID=none \
-    REMOTE_HOST=none
 
-#Vim to modify ass porky
-RUN apt-get update  && \
+# Install dependencies and utilities
+RUN apt-get update && \
     apt-get install --no-install-recommends -y \
-    wget python python-pip \
-    openjdk-8-jdk vim unzip curl net-tools
+    default-jre wget procps maven curl python3 python3-pip python3-venv net-tools
 
-ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
-ENV PATH="/usr/lib/jvm/java-8-openjdk-amd64/bin:${PATH}"
+# Install python galaxy bindings
+RUN python3 -m venv /python-galaxy && /python-galaxy/bin/pip install bioblend galaxy-ie-helpers
+COPY galaxy/upload-file.py /python-galaxy/upload-file.py
 
-RUN pip install setuptools && \
-    pip install bioblend galaxy-ie-helpers && \
-    pip install https://github.com/ValentinChCloud/urllib2_file/archive/master.tar.gz
+# Download Openrefine
+RUN wget -O - https://github.com/OpenRefine/OpenRefine/releases/download/3.8.2/openrefine-linux-3.8.2.tar.gz | tar -xz && \
+    mv openrefine-3.8.2 /openrefine
 
-# Download and "mount" OpenRefine
-RUN wget -q -O - --no-check-certificate https://github.com/ValentinChCloud/OpenRefine/archive/master.tar.gz |tar -xz && \
-    mv OpenRefine-master OpenRefine
+# Copy our extension
+COPY extension /openrefine/webapp/extensions/biodec-galaxy-exporter
 
-# make some changes to Openrefine to export data to galaxy history
-ADD ./ExportRowsCommand.java OpenRefine/main/src/com/google/refine/commands/project/ExportRowsCommand.java
-ADD ./exporters.js OpenRefine/main/webapp/modules/core/scripts/project/exporters.js
-ADD ./langs/translation-default.json OpenRefine/main/webapp/modules/core/langs/translation-default.json
-ADD ./langs/translation-fr.json OpenRefine/main/webapp/modules/core/langs/translation-fr.json
-ADD ./langs/translation-fr.json OpenRefine/main/webapp/modules/core/langs/translation-en.json
+# Copy and configure bash-refine
+COPY bash-refine /openrefine/bash-refine
+# It needs to find openrefine otherwise it will download it
+RUN mkdir /openrefine/bash-refine/lib
+RUN ln -s /openrefine /openrefine/bash-refine/lib/openrefine
 
-RUN /OpenRefine/refine build
+# Building the extension
+WORKDIR openrefine/webapp/extensions/biodec-galaxy-exporter
+RUN mvn clean && mvn package
 
-#Get python api openrefine
-RUN wget -q -O - --no-check-certificate https://github.com/maxogden/refine-python/archive/master.tar.gz | tar -xz && \
-    mv refine-python-master refine-python
-
-#Import data
-ADD ./get_notebook.py /get_notebook.py
-
-# not needed anymore
-#ADD ./startup.sh /startup.sh
-
-# Create and export project
-ADD ./openrefine_create_project_API.py /refine-python/openrefine_create_project_API.py
-ADD ./openrefine_export_project.py /refine-python/openrefine_export_project.py
-
-# /import will be the universal mount-point for Jupyter
-# The Galaxy instance can copy in data that needs to be present to the
-# container
+# Prepare I/O directory
 RUN mkdir /import
 
-VOLUME ["/import"]
-WORKDIR /import/
+# Cleanup
+RUN apt-get autoremove
+
+# Ready to be used
+WORKDIR /openrefine
 
 EXPOSE 3333
+
